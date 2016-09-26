@@ -1,13 +1,280 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>VerneMQ Management Dashboard</title>
-<meta name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<link href="static/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
-<link rel="stylesheet" href="static/css/vmq_dashboard.css" type="text/css"/>
+    <meta charset="UTF-8">
+    <title>VerneMQ Management Dashboard</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link href="static/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" href="static/css/bootstrap.css" type="text/css"/>
+    <link rel="stylesheet" href="static/css/sog.min.css" type="text/css"/>
+    <link rel="stylesheet" href="static/css/nv.d3.css"/>
+    <link rel="stylesheet" href="static/css/vmq_dashboard.css" type="text/css"/>
 </head>
-<body class="vmq-dashboard">
+<body class="page-body">
+<div class="page-container">
+
+    <div class="sidebar-menu toggle-others fixed">
+
+        <div class="sidebar-menu-inner">
+
+            <header class="logo-env">
+                <div class="logo">
+                    <a href="/" class="logo-expanded">
+                        <img class="logo-img" src="static/imgs/logo.png" alt="logo"/>
+                    </a>
+                    <a href="/" class="logo-collapsed"> <img class="logo-img"
+                                                             src="static/imgs/logo.png" alt="logo"/>
+                    </a>
+                </div>
+
+                <div class="mobile-menu-toggle visible-xs">
+                    <a href="#" data-toggle="user-info-menu"> <i class="glyphicon glyphicon-user"></i>
+                    </a> <a href="#" data-toggle="mobile-menu"> <i class="glyphicon glyphicon-menu-hamburger"></i>
+                </a>
+                </div>
+            </header>
+
+            <ul id="main-menu" class="main-menu">
+                <li module="overview" class="active"><a href="/#/overview"> <i
+                        class="dash-icon dash-icon-overview"></i> <span class="title">Server Overview</span>
+                </a></li>
+                <li module="metrics"><a href="/#/metrics">
+                    <i class="dash-icon dash-icon-metrics"></i> <span class="title">Metrics</span>
+                </a></li>
+                <li module="topics"><a href="/#/topics"> <i
+                        class="dash-icon dash-icon-topics"></i> <span class="title">Topics</span>
+                </a></li>
+                <li module="subscriptions"><a href="/#/subscriptions"> <i
+                        class="dash-icon dash-icon-subscriptions"></i> <span class="title">Open Subscriptions</span>
+                </a></li>
+                <li module="users"><a href="/#/users"> <i
+                        class="dash-icon dash-icon-admins"></i> <span class="title">Security</span>
+                </a></li>
+                <li module="http_api"><a href="/#/http_api"> <i
+                        class="dash-icon dash-icon-http-api"></i> <span class="title">Configuration</span>
+                </a></li>
+            </ul>
+
+        </div> <!-- /.sidebar-menu-inner -->
+
+    </div> <!-- /.sidebar-menu -->
+
+    <div class="main-content">
+
+        <nav class="navbar user-info-navbar" role="navigation">
+
+            <!-- Right links for user info navbar -->
+            <ul class="user-info-menu right-links list-inline list-unstyled">
+                <li>
+                    <a>
+                        <span class="status active">&nbsp;</span>
+                        VerneMQ <span id="version">0.14.1</span> uptime: 3 months 2 weeks 1day
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- main center -->
+        <div id="main_center">
+            <div class="row" id="overview_broker">
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Overview</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6 text-center">
+                                    <b>Outgoing Messages</b>
+                                    <p class="vmq-metric-bigtext">5234736</p>
+                                </div>
+                                <div class="col-sm-6 text-center">
+                                    <b>Incoming Messages</b>
+                                    <p class="vmq-metric-bigtext">9199139</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 text-center">
+                                <b>Clients</b>
+                                <div id="active-users-chart">
+                                    <svg></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Cluster Nodes (<em id="nodes_count">10</em>)
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-condensed">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Erlang/OTP Release</th>
+                                    <th>Erlang Processes<br/>(used/avaliable)</th>
+                                    <th>CPU<br/>(1load/5load/15load)</th>
+                                    <th>Memory<br/>(used/total)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="node in nodes">
+                                    <td>{{ node['name'] }}</td>
+                                    <td>{{ node['otp_release'] }}</td>
+                                    <td>{{ node['process_used'] }}</td>
+                                    <td>{{ node['load1'] }} / {{ node['load5'] }} / {{ node['load15'] }}</td>
+                                    <td>{{ node['used_memory'] }} / {{ node['total_memory'] }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="overview_nodes">
+
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Incoming/Outgoing Messages</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-12 realtime-graph">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="dashboard_overview" class="collapse"></div>
+            <div id="dashboard_metrics" class="collapse"></div>
+            <div id="dashboard_clients" class="collapse"></div>
+            <div id="dashboard_sessions" class="collapse"></div>
+            <div id="dashboard_topics" class="collapse"></div>
+            <div id="dashboard_routes" class="collapse"></div>
+            <div id="dashboard_subscriptions" class="collapse"></div>
+            <div id="dashboard_alarms" class="collapse"></div>
+            <div id="dashboard_websocket" class="collapse"></div>
+            <div id="dashboard_users" class="collapse"></div>
+            <div id="dashboard_http_api" class="collapse"></div>
+        </div>
+
+    </div>
+</div>
 </body>
+<script src="static/js/jquery.min.js"></script>
+<script src="static/js/bootstrap.js"></script>
+<script src="static/js/sog.js"></script>
+<script src="static/js/mqttws31.js"></script>
+<script src="static/js/d3.min.js"></script>
+<script src="static/js/nv.d3.js"></script>
+<script>
+
+    var data = [
+        {
+            "label": "Active",
+            "value": 290,
+            "color": "#CA60A1"
+        },
+        {
+            "label": "Inactive",
+            "value": 45,
+            "color": "#6691A2"
+        }
+    ];
+    nv.addGraph(function () {
+        var chart = nv.models.pieChart()
+                .x(function (d) {
+                    return d.label
+                })
+                .y(function (d) {
+                    return d.value
+                })
+                .legendPosition("top")
+                .showLabels(false);
+
+        d3.select("#active-users-chart svg")
+                .datum(data)
+                .transition().duration(1200)
+                .call(chart);
+
+        return chart;
+    });
+
+    (function () {
+        var draw_ui_graph;
+
+        draw_ui_graph = function () {
+            var data, graph, graph_type, height, j, k, l, len, line, redraw, ref, results, results1, update_freq, width, x, y;
+            graph = d3.select('.realtime-graph').append('svg:svg').attr('width', '100%').attr('height', '100%');
+            data = {
+                reads: (function () {
+                    results = [];
+                    for (j = 0; j <= 80; j++) {
+                        results.push(j);
+                    }
+                    return results;
+                }).apply(this).map(function (i) {
+                    return Math.floor(Math.random() * 4 + 42);
+                }),
+                writes: (function () {
+                    results1 = [];
+                    for (k = 0; k <= 80; k++) {
+                        results1.push(k);
+                    }
+                    return results1;
+                }).apply(this).map(function (i) {
+                    return Math.floor(Math.random() * 20 + 15);
+                })
+            };
+            update_freq = 1250;
+            width = 800;
+            height = 150;
+            x = d3.scale.linear().domain([0, 48]).range([-5, width]);
+            y = d3.scale.linear().domain([50, 0]).range([0, height]);
+            line = d3.svg.line().x(function (d, i) {
+                return x(i);
+            }).y(function (d) {
+                return y(d);
+            }).interpolate('linear');
+            ref = ['reads', 'writes'];
+            for (l = 0, len = ref.length; l < len; l++) {
+                graph_type = ref[l];
+                graph.selectAll("path." + graph_type).data([data[graph_type]]).enter().append('svg:path').attr('class', graph_type).attr('d', line);
+            }
+            redraw = function () {
+                var len1, m, ref1, results2;
+                ref1 = ['reads', 'writes'];
+                results2 = [];
+                for (m = 0, len1 = ref1.length; m < len1; m++) {
+                    graph_type = ref1[m];
+                    results2.push(graph.selectAll("path." + graph_type).data([data[graph_type]]).attr('transform', "translate(" + (x(1)) + ")").attr('d', line).interrupt().transition().ease('linear').duration(update_freq).attr('transform', "translate(" + (x(0)) + ")"));
+                }
+                return results2;
+            };
+            return setInterval(function () {
+                var arr, len1, m, ref1;
+                ref1 = [data['reads'], data['writes']];
+                for (m = 0, len1 = ref1.length; m < len1; m++) {
+                    arr = ref1[m];
+                    arr.push(arr.shift());
+                }
+                return redraw();
+            }, update_freq);
+        };
+
+        draw_ui_graph();
+
+    }).call(this);
+
+
+</script>
 </html>
