@@ -7,9 +7,10 @@
                   kernel,
                   stdlib,
                   lager,
+                  jsx,
                   cowboy,
-                  cowboy_swagger,
-                  jsx
+                  trails,
+                  cowboy_swagger
                  ]},
   {mod, {vernemq_demo_plugin_app, []}},
   {env, [
