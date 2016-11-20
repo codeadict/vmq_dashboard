@@ -8,10 +8,14 @@
                   stdlib,
                   lager,
                   cowboy,
+                  cowboy_swagger,
                   jsx
                  ]},
-  {mod, { vernemq_demo_plugin_app, []}},
+  {mod, {vernemq_demo_plugin_app, []}},
   {env, [
          {vmq_plugin_hooks, []}
-        ]}
+        ]},
+  {maintainers, ["Dairon Medina <me@dairon.org>"]},
+  {licenses, ["Apache 2"]},
+  {links, [{"Github", "https://github.com/codeadict/vmq_dashboard"}]}
  ]}.
