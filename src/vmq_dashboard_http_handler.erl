@@ -50,6 +50,6 @@ content_types_provided(Req, State) ->
 
 to_json(Req, State) ->
     {_MetricName, Req2} = cowboy_req:binding(metric, Req),
-    Reply = #{<<>>, <<>>},
+    Reply = #{},
     Json = jsx:encode(Reply),
     {Json, Req2, State}.
