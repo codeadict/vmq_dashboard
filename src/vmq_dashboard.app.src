@@ -1,4 +1,4 @@
-{application, vernemq_demo_plugin,
+{application, vmq_dashboard,
  [
   {description, "VerneMQ Management Dashboard"},
   {vsn, "0.0.1"},
